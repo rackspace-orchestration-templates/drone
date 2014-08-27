@@ -96,10 +96,20 @@ resources:
             curl -sSL https://get.docker.io/ubuntu/ | sh
             # Install docker-py
             pip install docker-py
+            # Generate self signed certificate
+            mkdir -p /etc/drone/ssl
+            openssl req -new -newkey rsa:4096 -nodes -x509 -subj "/C=US/ST=Texas/L=San Antonio/O=Drone/CN=www.drone.com" -keyout /etc/drone/ssl/drone.key -out /etc/drone/ssl/drone.crt
             # Download DEB and Install
             wget -ct0 %drone_deb_location%
             dpkg -i drone.deb
-            ufw allow 80
+            # Configure and Restart Drone
+            echo 'DRONED_OPTS="--port=:443 --sslcert=/etc/drone/ssl/drone.crt --sslkey=/etc/drone/ssl/drone.key"' >> /etc/default/drone
+            stop drone
+            start drone
+            # Open and Enable ufw
+            ufw allow 443
+            ufw allow 22
+            ufw enable
           params:
             "%drone_deb_location%": { get_param: drone_deb_location }
 
@@ -111,7 +121,7 @@ outputs:
   drone_url:
     value:
       str_replace:
-        template: "http://%server_ip%"
+        template: "https://%server_ip%"
         params:
           "%server_ip%": { get_attr: [ drone, accessIPv4 ] }
     description: Drone URL
