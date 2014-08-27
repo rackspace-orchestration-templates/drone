@@ -1,0 +1,17 @@
+schema-version: 1.0.0
+application-family: Testing
+application-name: Drone.io
+application-version: latest
+flavor: Single Linux server
+flavor-weight: 1
+hidden_outputs:
+  - private_key
+abstract: |
+  Single Linux server running [Drone](https://drone.io/).
+instructions: |
+  #### Logging in via SSH
+  The private key provided in the passwords section can be used to login as
+  root via SSH.  We have an article on how to use these keys with [Mac OS X and
+  Linux](http://www.rackspace.com/knowledge_center/article/logging-in-with-a-ssh-private-key-on-linuxmac)
+  as well as [Windows using
+  PuTTY](http://www.rackspace.com/knowledge_center/article/logging-in-with-a-ssh-private-key-on-windows).
