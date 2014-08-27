@@ -97,8 +97,9 @@ resources:
             # Install docker-py
             pip install docker-py
             # Generate self signed certificate
+            SERVER_IP=`ifconfig eth0 | grep "inet addr:" | cut -d: -f2 | awk '{print $1}'`
             mkdir -p /etc/drone/ssl
-            openssl req -new -newkey rsa:4096 -nodes -x509 -subj "/C=US/ST=Texas/L=San Antonio/O=Drone/CN=%server_ip%" -keyout /etc/drone/ssl/drone.key -out /etc/drone/ssl/drone.crt
+            openssl req -new -newkey rsa:4096 -nodes -x509 -subj "/C=US/ST=Texas/L=San Antonio/O=Drone/CN=${SERVER_IP}" -keyout /etc/drone/ssl/drone.key -out /etc/drone/ssl/drone.crt
             # Download DEB and Install
             wget -ct0 %drone_deb_location%
             dpkg -i drone.deb
@@ -112,7 +113,6 @@ resources:
             ufw enable
           params:
             "%drone_deb_location%": { get_param: drone_deb_location }
-            "%server_ip%": { get_attr: [ drone, accessIPv4 ] }
 
 outputs:
   private_key:
