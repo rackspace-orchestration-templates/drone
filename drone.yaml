@@ -110,7 +110,7 @@ resources:
             # Open and Enable ufw
             ufw allow 443
             ufw allow 22
-            ufw enable
+            ufw --force enable
           params:
             "%drone_deb_location%": { get_param: drone_deb_location }
 
