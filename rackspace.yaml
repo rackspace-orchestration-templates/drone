@@ -15,3 +15,14 @@ instructions: |
   Linux](http://www.rackspace.com/knowledge_center/article/logging-in-with-a-ssh-private-key-on-linuxmac)
   as well as [Windows using
   PuTTY](http://www.rackspace.com/knowledge_center/article/logging-in-with-a-ssh-private-key-on-windows).
+  #### Drone Configuration
+  Drone's configuration is controlled using the DRONED_OPTS variable as defined in /etc/default/drone.
+  #### Drone Service
+  Drone can be controlled using the standard 'start' and 'stop' service commands.
+  start drone
+  stop drone
+  #### SSL Configuration
+  This setup provides a self signed SSL certificate with the server's IP address as the Common Name.
+  To provide a new certificate, simply overwrite the two files in /etc/drone/ssl/ with your signed
+  certificates.
+  Restart Drone to apply the new certificate.
