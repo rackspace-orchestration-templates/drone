@@ -13,9 +13,9 @@ abstract: |
   Single Linux server running [Drone](https://github.com/drone/drone).
 instructions: |
   #### Welcome to Drone
-  This will deploy a single Linux server running [Drone](https://github.com/drone/drone). Before you get
-  started, create an admin user in Drone by accessing your server at [https://serverip/install](https://serverip/install).
-  Please read the following sections carefully.
+  This will deploy a single Linux server running
+  [Drone](https://github.com/drone/drone). Before you get started, create an
+  admin user by accessing the Drone URL provided above.
 
   #### Logging in via SSH
   The private key provided in the passwords section can be used to login as
@@ -24,27 +24,28 @@ instructions: |
   as well as [Windows using
   PuTTY](http://www.rackspace.com/knowledge_center/article/logging-in-with-a-ssh-private-key-on-windows).
 
-  #### Drone Configuration
-  There are two main places to configure your Drone instance.
-
   ##### Daemon Options
-  Drone's configuration is controlled using the DRONED_OPTS variable as defined in /etc/default/drone.
-  You can find some of the options in the [Drone Documentation](http://drone.readthedocs.org/en/latest/install.html).
+  Drone's configuration is controlled using the DRONED_OPTS variable as defined
+  in /etc/default/drone. You can find some of the options in the [Drone
+  Documentation](http://drone.readthedocs.org/en/latest/install.html).
 
   ##### Web Interface
-  There are many options you can configure in the web interface on your Drone instance. You will want to follow
-  the [setup documentation](http://drone.readthedocs.org/en/latest/setup.html) to configure the basics.
+  There are many options you can configure in the web interface on your Drone
+  instance. You will want to follow the [setup
+  documentation](http://drone.readthedocs.org/en/latest/setup.html) to
+  configure the basics.
 
   #### Drone Service
-  Drone can be controlled using the standard 'start' and 'stop' service commands. You will need to
-  restart drone if you modify the above configuration in /etc/default/drone.
+  Drone can be controlled using the standard 'start' and 'stop' service
+  commands. You will need to restart drone if you modify the above
+  configuration in /etc/default/drone.
 
   To restart Drone, issue these commands:
   stop drone
   start drone
 
   #### SSL Configuration
-  This setup provides a self signed SSL certificate with the server's IP address as the Common Name.
-  To provide a new certificate, simply overwrite the two files in /etc/drone/ssl/ with your signed
-  certificates.
-  Restart Drone to apply the new certificate.
+  This setup provides a self signed SSL certificate with the server's IP
+  address as the Common Name. To provide a new certificate, simply overwrite
+  the two files in /etc/drone/ssl/ with your signed certificates. Restart Drone
+  to apply the new certificate.
