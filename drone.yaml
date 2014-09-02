@@ -122,7 +122,7 @@ outputs:
   drone_url:
     value:
       str_replace:
-        template: "https://%server_ip%"
+        template: "https://%server_ip%/install"
         params:
           "%server_ip%": { get_attr: [ drone, accessIPv4 ] }
     description: Drone URL
