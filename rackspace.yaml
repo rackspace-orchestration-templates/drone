@@ -24,12 +24,12 @@ instructions: |
   as well as [Windows using
   PuTTY](http://www.rackspace.com/knowledge_center/article/logging-in-with-a-ssh-private-key-on-windows).
 
-  ##### Daemon Options
+  #### Daemon Options
   Drone's configuration is controlled using the DRONED_OPTS variable as defined
   in /etc/default/drone. You can find some of the options in the [Drone
   Documentation](http://drone.readthedocs.org/en/latest/install.html).
 
-  ##### Web Interface
+  #### Web Interface
   There are many options you can configure in the web interface on your Drone
   instance. You will want to follow the [setup
   documentation](http://drone.readthedocs.org/en/latest/setup.html) to
