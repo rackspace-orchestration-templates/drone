@@ -67,7 +67,7 @@ parameters:
     description: Location of the Drone Deb File
     type: string
     default: |
-      http://downloads.drone.io/latest/drone.deb
+      http://downloads.drone.io/master/drone.deb
 
 resources:
 
@@ -91,7 +91,7 @@ resources:
           template: |
             #!/bin/bash -v
             # Install Dependencies
-            apt-get install -y python-pip
+            apt-get install -y python-pip bc
             # Install Docker
             curl -sSL https://get.docker.io/ubuntu/ | sh
             # Install docker-py
@@ -104,7 +104,19 @@ resources:
             wget -ct0 %drone_deb_location%
             dpkg -i drone.deb
             # Configure and Restart Drone
-            echo 'DRONED_OPTS="--port=:443 --sslcert=/etc/drone/ssl/drone.crt --sslkey=/etc/drone/ssl/drone.key"' >> /etc/default/drone
+            cp /etc/drone/drone.toml /etc/drone/drone.toml.bak
+            cat >/etc/drone/drone.toml <<EOF
+              [server]
+              port=":443"
+
+              [server.ssl]
+              key="/etc/drone/ssl/drone.key"
+              cert="/etc/drone/ssl/drone.crt"
+
+              [database]
+              driver="sqlite3"
+              datasource="/var/lib/drone/drone.sqlite"
+            EOF
             stop drone
             start drone
             # Open and Enable ufw
