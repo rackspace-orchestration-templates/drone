@@ -2,6 +2,7 @@ heat_template_version: 2013-05-23
 
 description: |
   A template that deploys open source Drone.io onto a single Linux server.
+  Requires you provide a Github Application Client ID and Secret.
 
 parameter_groups:
 
@@ -9,6 +10,11 @@ parameter_groups:
   parameters:
   - flavor
   - image
+
+- label: Drone OAuth Settings
+  parameters:
+  - github_client_id
+  - github_client_secret
 
 - label: rax-dev-params
   # These are parameters that will not be displayed in the portal. The purpose
@@ -64,10 +70,22 @@ parameters:
 
   drone_deb_location:
     label: Drone DEB Location
-    description: Location of the Drone Deb File
+    description: Location of the Drone Deb File.
     type: string
     default: |
       http://downloads.drone.io/master/drone.deb
+
+  github_client_id:
+    label: Github Application Client ID
+    description: The Github Application Client ID.
+    type: string
+    default: ''
+
+  github_client_secret:
+    label: Github Application Client Secret
+    description: The Github Application Client Secret.
+    type: string
+    default: ''
 
 resources:
 
@@ -116,6 +134,10 @@ resources:
               [database]
               driver="sqlite3"
               datasource="/var/lib/drone/drone.sqlite"
+
+              [github]
+              client="%github_client_id%"
+              secret="%github_client_secret%"
             EOF
             stop drone
             start drone
@@ -125,6 +147,8 @@ resources:
             ufw --force enable
           params:
             "%drone_deb_location%": { get_param: drone_deb_location }
+            "%github_client_id%": { get_param: github_client_id }
+            "%github_client_secret%": { get_param: github_client_secret }
 
 outputs:
   private_key:
