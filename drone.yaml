@@ -11,11 +11,6 @@ parameter_groups:
   - flavor
   - image
 
-- label: Drone OAuth Settings
-  parameters:
-  - github_client_id
-  - github_client_secret
-
 - label: rax-dev-params
   # These are parameters that will not be displayed in the portal. The purpose
   # of these parameters are for users who are developing or testing newer or
@@ -77,15 +72,24 @@ parameters:
 
   github_client_id:
     label: Github Application Client ID
-    description: The Github Application Client ID.
+    description: |
+      The Github Application Client ID. [Register your
+      application.](https://github.com/settings/applications/new)
     type: string
     default: ''
+    constraints:
+    - allowed_pattern: (^[0-9a-f]{20}$)|(^$)
+      
 
   github_client_secret:
     label: Github Application Client Secret
-    description: The Github Application Client Secret.
+    description: |
+      The Github Application Client Secret. [Register your
+      application.](https://github.com/settings/applications/new)
     type: string
     default: ''
+    constraints:
+    - allowed_pattern: (^[0-9a-f]{40}$)|(^$)
 
 resources:
 
