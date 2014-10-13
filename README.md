@@ -26,7 +26,9 @@ Parameters
 Parameters can be replaced with your own values when standing up a stack. Use
 the `-P` flag to specify a custom parameter.
 
-* `github_client_secret`: The Github Application Client Secret. (Default: '')
+* `github_client_secret`: The Github Application Client Secret. [Register your
+application.](https://github.com/settings/applications/new)
+ (Default: '')
 * `drone_deb_location`: Location of the Drone Deb File. (Default: http://downloads.drone.io/master/drone.deb
 )
 * `server_name`: The instance name (Default: drone)
@@ -36,7 +38,9 @@ deployment
 * `flavor`: Rackspace Cloud Server flavor to use. The size is based on the amount of
 RAM for the provisioned server.
  (Default: 1 GB Performance)
-* `github_client_id`: The Github Application Client ID. (Default: '')
+* `github_client_id`: The Github Application Client ID. [Register your
+application.](https://github.com/settings/applications/new)
+ (Default: '')
 
 Outputs
 =======
