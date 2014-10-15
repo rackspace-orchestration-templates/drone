@@ -2,6 +2,7 @@ heat_template_version: 2013-05-23
 
 description: |
   A template that deploys open source Drone.io onto a single Linux server.
+  Requires you provide a Github Application Client ID and Secret.
 
 parameter_groups:
 
@@ -64,10 +65,31 @@ parameters:
 
   drone_deb_location:
     label: Drone DEB Location
-    description: Location of the Drone Deb File
+    description: Location of the Drone Deb File.
     type: string
     default: |
-      http://downloads.drone.io/latest/drone.deb
+      http://downloads.drone.io/master/drone.deb
+
+  github_client_id:
+    label: Github Application Client ID
+    description: |
+      The Github Application Client ID. [Register your
+      application.](https://github.com/settings/applications/new)
+    type: string
+    default: ''
+    constraints:
+    - allowed_pattern: (^[0-9a-f]{20}$)|(^$)
+      
+
+  github_client_secret:
+    label: Github Application Client Secret
+    description: |
+      The Github Application Client Secret. [Register your
+      application.](https://github.com/settings/applications/new)
+    type: string
+    default: ''
+    constraints:
+    - allowed_pattern: (^[0-9a-f]{40}$)|(^$)
 
 resources:
 
@@ -91,7 +113,7 @@ resources:
           template: |
             #!/bin/bash -v
             # Install Dependencies
-            apt-get install -y python-pip
+            apt-get install -y python-pip bc
             # Install Docker
             curl -sSL https://get.docker.io/ubuntu/ | sh
             # Install docker-py
@@ -104,7 +126,23 @@ resources:
             wget -ct0 %drone_deb_location%
             dpkg -i drone.deb
             # Configure and Restart Drone
-            echo 'DRONED_OPTS="--port=:443 --sslcert=/etc/drone/ssl/drone.crt --sslkey=/etc/drone/ssl/drone.key"' >> /etc/default/drone
+            cp /etc/drone/drone.toml /etc/drone/drone.toml.bak
+            cat >/etc/drone/drone.toml <<EOF
+              [server]
+              port=":443"
+
+              [server.ssl]
+              key="/etc/drone/ssl/drone.key"
+              cert="/etc/drone/ssl/drone.crt"
+
+              [database]
+              driver="sqlite3"
+              datasource="/var/lib/drone/drone.sqlite"
+
+              [github]
+              client="%github_client_id%"
+              secret="%github_client_secret%"
+            EOF
             stop drone
             start drone
             # Open and Enable ufw
@@ -113,6 +151,8 @@ resources:
             ufw --force enable
           params:
             "%drone_deb_location%": { get_param: drone_deb_location }
+            "%github_client_id%": { get_param: github_client_id }
+            "%github_client_secret%": { get_param: github_client_secret }
 
 outputs:
   private_key:

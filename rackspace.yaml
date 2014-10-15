@@ -14,8 +14,17 @@ abstract: |
 instructions: |
   #### Welcome to Drone
   This will deploy a single Linux server running
-  [Drone](https://github.com/drone/drone). Before you get started, create an
-  admin user by accessing the Drone URL provided above.
+  [Drone](https://github.com/drone/drone).
+
+  #### Github Application Requirement
+  In order to login to Drone, a Github Application is required. Read the [setup
+  instructions](https://github.com/drone/drone#github) for details on this
+  process. The Application ID and Secret have to be placed in the
+  /etc/drone/drone.toml file.
+
+  By default, this template will deploy as HTTPS instead of HTTP. Be sure to
+  configure the appropriate Homepage and Callback URL using HTTPS. The use
+  of DNS names is highly recommended.
 
   #### Logging in via SSH
   The private key provided in the passwords section can be used to login as
@@ -24,10 +33,11 @@ instructions: |
   as well as [Windows using
   PuTTY](http://www.rackspace.com/knowledge_center/article/logging-in-with-a-ssh-private-key-on-windows).
 
-  #### Daemon Options
-  Drone's configuration is controlled using the DRONED_OPTS variable as defined
-  in /etc/default/drone. You can find some of the options in the [Drone
-  Documentation](http://drone.readthedocs.org/en/latest/install.html).
+  #### Drone Configuration Options
+  Drone's configuration is controlled using the /etc/drone/drone.toml
+  file. If you do not provide your Github Application ID and Secret
+  you will need to login to the server and update these options manually.
+  After updating the configuration file, restart Drone.
 
   #### Web Interface
   There are many options you can configure in the web interface on your Drone
