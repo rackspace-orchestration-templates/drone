@@ -59,3 +59,4 @@ instructions: |
   address as the Common Name. To provide a new certificate, simply overwrite
   the two files in /etc/drone/ssl/ with your signed certificates. Restart Drone
   to apply the new certificate.
+user-input-required: true
