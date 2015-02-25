@@ -119,6 +119,7 @@ resources:
             # Make Pillar folder
             mkdir /srv/pillar
             # Clone down States
+            apt-get install git -y
             git clone https://github.com/rackspace-orchestration-templates/salt-states.git /srv/salt
             # Write out Pillar top.sls
             echo "base:
