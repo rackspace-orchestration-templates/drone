@@ -148,6 +148,8 @@ resources:
               packages:
                 - bc
                 - python-pip
+                - python-dev
+                - build-essential
             " > /srv/pillar/localhost.sls
             #######################################
             ## END ################################
