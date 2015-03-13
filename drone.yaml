@@ -108,53 +108,64 @@ resources:
       name: { get_param: server_name }
       metadata:
         rax-heat: { get_param: "OS::stack_id" }
+      config_drive: "true"
+      user_data_format: RAW
       user_data:
         str_replace:
           template: |
-            #!/bin/bash
-            # Install salt-minion using Salt Bootstrap
-            curl -L https://bootstrap.saltstack.com | sudo sh -s --
-            salt-minion --versions
+            #cloud-config
+            package_update: true
+            packages:
+              - git
+            write_files:
             # Set salt-minion to only use local resources
-            echo "file_client: local" > /etc/salt/minion.d/local.conf
-            # Make Pillar folder
-            mkdir /srv/pillar
-            # Clone down States
-            apt-get install git -y
-            git clone https://github.com/rackspace-orchestration-templates/salt-states.git /srv/salt
+              - path: /etc/salt/minion.d/local.conf
+                permissions: '0644'
+                content: |
+                  file_client: local
             # Write out Pillar top.sls
-            echo "base:
-              '*':
-                - localhost" > /srv/pillar/top.sls
+              - path: /srv/pillar/top.sls
+                permissions: '0600'
+                content: |
+                  base:
+                    '*':
+                      - localhost
             # Write out State top.sls
-            echo "base:
-              '*':
-                - salt-minion" > /srv/salt/top.sls
-            #######################################
-            ## Edit this section ##################
-            #######################################
-            
-            # Add states to the base (4 spaces)
-            echo "    - docker
-                - drone
-            " >> /srv/salt/top.sls
+              - path: /srv/salt/top.sls
+                permissions: '0644'
+                content: |
+                  base:
+                    '*':
+                      - salt-minion
+                      - docker
+                      - drone
             # Example Pillar Data using %value% notation
             # See example pillar data from states repository.
-            echo "
-            drone:
-              deb_url: %drone_deb_location%
-              github_client: %github_client_id%
-              github_secret: %github_client_secret%
-            " > /srv/pillar/localhost.sls
-            #######################################
-            ## END ################################
-            #######################################
-            # Run local highstate
-            salt-call --local state.highstate
-            # Open and Enable ufw
-            ufw allow 443
-            ufw allow 22
-            ufw --force enable
+              - path: /srv/pillar/localhost.sls
+                permissions: '0600'
+                content: |
+                  drone:
+                    deb_url: %drone_deb_location%
+                    github_client: %github_client_id%
+                    github_secret: %github_client_secret%
+            # Salt Bootstrap script
+              - path: /tmp/heat/salt_run.sh
+                permissions: '0600'
+                content: |
+                  #!/bin/bash
+                  # Install salt-minion using Salt Bootstrap
+                  curl -L https://bootstrap.saltstack.com | sudo sh -s --
+                  salt-minion --versions
+                  # Clone down States
+                  git clone https://github.com/rackspace-orchestration-templates/salt-states.git /srv/salt
+                  # Run local highstate
+                  salt-call --local state.highstate
+                  # Open and Enable ufw
+                  ufw allow 443
+                  ufw allow 22
+                  ufw --force enable
+            runcmd:
+              - /tmp/heat/salt_run.sh
           params:
             "%drone_deb_location%": { get_param: drone_deb_location }
             "%github_client_id%": { get_param: github_client_id }
