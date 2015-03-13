@@ -157,7 +157,9 @@ resources:
                   curl -L https://bootstrap.saltstack.com | sudo sh -s --
                   salt-minion --versions
                   # Clone down States
-                  git clone https://github.com/rackspace-orchestration-templates/salt-states.git /srv/salt
+                  mkdir -p /tmp/heat/states
+                  git clone https://github.com/rackspace-orchestration-templates/salt-states.git /tmp/heat/states
+                  cp -nr /tmp/heat/states/* /srv/salt/
                   # Run local highstate
                   salt-call --local state.highstate
                   # Open and Enable ufw
