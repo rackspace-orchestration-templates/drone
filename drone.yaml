@@ -150,7 +150,7 @@ resources:
                     github_secret: %github_client_secret%
             # Salt Bootstrap script
               - path: /tmp/heat/salt_run.sh
-                permissions: '0600'
+                permissions: '0500'
                 content: |
                   #!/bin/bash
                   # Install salt-minion using Salt Bootstrap
