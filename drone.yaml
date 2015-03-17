@@ -93,6 +93,15 @@ parameters:
 
 resources:
 
+  wait_condition:
+    type: OS::Heat::SwiftSignal
+    properties:
+      handle: { get_resource: wait_condition_handle }
+      timeout: 1800
+
+  wait_condition_handle:
+    type: OS::Heat::SwiftSignalHandle
+
   ssh_key:
     type: "OS::Nova::KeyPair"
     properties:
@@ -100,7 +109,7 @@ resources:
       save_private_key: true
 
   drone:
-    type: "Rackspace::Cloud::Server"
+    type: "OS::Nova::Server"
     properties:
       key_name: { get_resource: ssh_key }
       flavor: { get_param: flavor }
@@ -108,51 +117,72 @@ resources:
       name: { get_param: server_name }
       metadata:
         rax-heat: { get_param: "OS::stack_id" }
+      config_drive: "true"
+      user_data_format: RAW
       user_data:
         str_replace:
           template: |
-            #!/bin/bash -v
-            # Install Dependencies
-            apt-get install -y python-pip bc
-            # Install Docker
-            curl -sSL https://get.docker.io/ubuntu/ | sh
-            # Install docker-py
-            pip install docker-py
-            # Generate self signed certificate
-            SERVER_IP=`ifconfig eth0 | grep "inet addr:" | cut -d: -f2 | awk '{print $1}'`
-            mkdir -p /etc/drone/ssl
-            openssl req -new -newkey rsa:4096 -nodes -x509 -subj "/C=US/ST=Texas/L=San Antonio/O=Drone/CN=${SERVER_IP}" -keyout /etc/drone/ssl/drone.key -out /etc/drone/ssl/drone.crt
-            # Download DEB and Install
-            wget -ct0 %drone_deb_location%
-            dpkg -i drone.deb
-            # Configure and Restart Drone
-            cp /etc/drone/drone.toml /etc/drone/drone.toml.bak
-            cat >/etc/drone/drone.toml <<EOF
-              [server]
-              port=":443"
-
-              [server.ssl]
-              key="/etc/drone/ssl/drone.key"
-              cert="/etc/drone/ssl/drone.crt"
-
-              [database]
-              driver="sqlite3"
-              datasource="/var/lib/drone/drone.sqlite"
-
-              [github]
-              client="%github_client_id%"
-              secret="%github_client_secret%"
-            EOF
-            stop drone
-            start drone
-            # Open and Enable ufw
-            ufw allow 443
-            ufw allow 22
-            ufw --force enable
+            #cloud-config
+            package_update: true
+            packages:
+              - git
+            write_files:
+            # Set salt-minion to only use local resources
+              - path: /etc/salt/minion.d/local.conf
+                permissions: '0644'
+                content: |
+                  file_client: local
+            # Write out Pillar top.sls
+              - path: /srv/pillar/top.sls
+                permissions: '0600'
+                content: |
+                  base:
+                    '*':
+                      - localhost
+            # Write out State top.sls
+              - path: /srv/salt/top.sls
+                permissions: '0644'
+                content: |
+                  base:
+                    '*':
+                      - salt-minion
+                      - docker
+                      - drone
+            # Example Pillar Data using %value% notation
+            # See example pillar data from states repository.
+              - path: /srv/pillar/localhost.sls
+                permissions: '0600'
+                content: |
+                  drone:
+                    deb_url: %drone_deb_location%
+                    github_client: %github_client_id%
+                    github_secret: %github_client_secret%
+            # Salt Bootstrap script
+              - path: /tmp/heat/salt_run.sh
+                permissions: '0500'
+                content: |
+                  #!/bin/bash
+                  # Install salt-minion using Salt Bootstrap
+                  curl -L https://bootstrap.saltstack.com | sudo sh -s --
+                  salt-minion --versions
+                  # Clone down States
+                  mkdir -p /tmp/heat/states
+                  git clone https://github.com/rackspace-orchestration-templates/salt-states.git /tmp/heat/states
+                  cp -nr /tmp/heat/states/* /srv/salt/
+                  # Run local highstate
+                  salt-call --local state.highstate
+                  # Open and Enable ufw
+                  ufw allow 443
+                  ufw allow 22
+                  ufw --force enable
+                  wc_notify --data-binary '{"status": "SUCCESS"}'
+            runcmd:
+              - /tmp/heat/salt_run.sh
           params:
             "%drone_deb_location%": { get_param: drone_deb_location }
             "%github_client_id%": { get_param: github_client_id }
             "%github_client_secret%": { get_param: github_client_secret }
+            wc_notify: { get_attr: ['wait_condition_handle', 'curl_cli'] }
 
 outputs:
   private_key:
