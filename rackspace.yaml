@@ -60,3 +60,5 @@ instructions: |
   the two files in /etc/drone/ssl/ with your signed certificates. Restart Drone
   to apply the new certificate.
 user-input-required: true
+description: |
+  Single Linux server running [Drone](https://github.com/drone/drone).
