@@ -10,7 +10,8 @@ reach-info:
 hidden_outputs:
   - private_key
 abstract: |
-  Single Linux server running [Drone](https://github.com/drone/drone).
+  Drone.io is a continuous integration solution for Github and BitBucket
+  repositories.
 instructions: |
   #### Welcome to Drone
   This will deploy a single Linux server running
