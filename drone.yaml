@@ -1,8 +1,7 @@
 heat_template_version: 2013-05-23
 
 description: |
-  A template that deploys open source Drone.io onto a single Linux server.
-  Requires you provide a Github Application Client ID and Secret.
+  Single Linux server running [Drone](https://github.com/drone/drone).
 
 parameter_groups:
 
